@@ -5,54 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Krishna Gopal Gaushala Sewa Trust</title>
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class'
-    }
+    tailwind.config = { darkMode: 'class' }
   </script>
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    .hero-slide { opacity: 0; transition: opacity 1s ease }
+    .hero-slide.active { opacity: 1 }
+    .glassmorphism { background: rgba(255,255,255,.15); backdrop-filter: blur(14px) }
+    .dark .glassmorphism { background: rgba(0,0,0,.35) }
+    .active-link { color:#16a34a; font-weight:600 }
+    .page-transition { animation: fade .4s ease }
+    @keyframes fade { from{opacity:.5} to{opacity:1} }
+    body.modal-open { overflow:hidden }
+  </style>
 </head>
 
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
-<!-- Cursor Canvas -->
-<canvas id="cursorCanvas" class="fixed top-0 left-0 pointer-events-none z-50"></canvas>
+<!-- Cursor -->
+<canvas id="cursor-trail" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
 <!-- NAVBAR -->
-<header class="sticky top-0 z-40 backdrop-blur bg-white/70 dark:bg-gray-900/70 shadow">
-  <nav class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-    <h1 class="font-bold text-lg">Krishna Gopal Trust</h1>
+<header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur shadow">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <a href="/" class="text-lg font-bold nav-link">Krishna Gopal Trust</a>
 
-    <ul id="navLinks" class="hidden md:flex gap-6 font-medium">
-      <li><a href="/" data-link class="nav-link">Home</a></li>
-      <li><a href="/about" data-link class="nav-link">About Us</a></li>
-      <li><a href="/mission" data-link class="nav-link">Mission</a></li>
-      <li><a href="/team" data-link class="nav-link">Our Team</a></li>
-      <li><a href="/contact" data-link class="nav-link">Contact</a></li>
-    </ul>
+    <nav class="hidden md:flex gap-6">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/mission" class="nav-link">Mission</a>
+      <a href="/team" class="nav-link">Team</a>
+      <a href="/contact" class="nav-link">Contact</a>
+    </nav>
 
     <div class="flex items-center gap-3">
-      <button id="themeToggle" class="px-3 py-1 rounded border dark:border-gray-600">
-        🌙
+      <button id="theme-toggle" class="p-2 rounded">
+        <i id="theme-icon" class="fas fa-moon"></i>
       </button>
-      <a href="/donate" data-link
-         class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-        Donate
-      </a>
+      <a href="/donate" class="nav-link bg-green-600 text-white px-4 py-2 rounded">Donate</a>
+
+      <button id="mobile-menu-button" class="md:hidden">
+        <i class="fas fa-bars"></i>
+      </button>
     </div>
-  </nav>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 px-4 py-4 space-y-3">
+    <a href="/" class="nav-link block">Home</a>
+    <a href="/about" class="nav-link block">About</a>
+    <a href="/mission" class="nav-link block">Mission</a>
+    <a href="/team" class="nav-link block">Team</a>
+    <a href="/contact" class="nav-link block">Contact</a>
+    <button id="theme-toggle-mobile" class="flex items-center gap-2">
+      <i id="theme-icon-mobile" class="fas fa-moon"></i> Toggle Theme
+    </button>
+  </div>
 </header>
 
-<!-- MAIN CONTENT -->
-<main id="app" class="min-h-screen"></main>
+<!-- MAIN -->
+<main id="app"></main>
 
-<!-- MODAL -->
-<div id="modal"
-     class="fixed inset-0 hidden bg-black/50 backdrop-blur flex items-center justify-center z-50">
-  <div class="bg-white dark:bg-gray-800 max-w-lg w-full p-6 rounded-lg relative">
-    <button id="closeModal" class="absolute top-2 right-3 text-xl">✖</button>
-    <div id="modalContent"></div>
+<!-- TEAM MODAL -->
+<div id="team-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl max-w-lg w-full relative">
+    <button id="close-modal" class="absolute top-2 right-3 text-xl">✖</button>
+    <img id="modal-photo" class="w-32 h-32 rounded-full mx-auto mb-4">
+    <h3 id="modal-name" class="text-xl font-bold text-center"></h3>
+    <p id="modal-designation" class="text-center text-green-600"></p>
+    <p id="modal-message" class="italic text-center my-4"></p>
+    <p><strong>Experience:</strong> <span id="modal-experience"></span></p>
+    <p><strong>Education:</strong> <span id="modal-education"></span></p>
+    <p class="mt-3" id="modal-bio"></p>
   </div>
 </div>
 
