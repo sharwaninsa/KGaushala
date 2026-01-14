@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Krishna Gopal Gaushala Sewa Trust</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+<!-- Cursor Canvas -->
+<canvas id="cursorCanvas" class="fixed top-0 left-0 pointer-events-none z-50"></canvas>
+
+<!-- NAVBAR -->
+<header class="sticky top-0 z-40 backdrop-blur bg-white/70 dark:bg-gray-900/70 shadow">
+  <nav class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <h1 class="font-bold text-lg">Krishna Gopal Trust</h1>
+
+    <ul id="navLinks" class="hidden md:flex gap-6 font-medium">
+      <li><a href="/" data-link class="nav-link">Home</a></li>
+      <li><a href="/about" data-link class="nav-link">About Us</a></li>
+      <li><a href="/mission" data-link class="nav-link">Mission</a></li>
+      <li><a href="/team" data-link class="nav-link">Our Team</a></li>
+      <li><a href="/contact" data-link class="nav-link">Contact</a></li>
+    </ul>
+
+    <div class="flex items-center gap-3">
+      <button id="themeToggle" class="px-3 py-1 rounded border dark:border-gray-600">
+        🌙
+      </button>
+      <a href="/donate" data-link
+         class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+        Donate
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<main id="app" class="min-h-screen"></main>
+
+<!-- MODAL -->
+<div id="modal"
+     class="fixed inset-0 hidden bg-black/50 backdrop-blur flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 max-w-lg w-full p-6 rounded-lg relative">
+    <button id="closeModal" class="absolute top-2 right-3 text-xl">✖</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
