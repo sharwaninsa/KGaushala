@@ -1,26 +1,14 @@
-/******************************
- * DATA (From Trust Deed)
- ******************************/
+// ================= DATA =================
 const carouselData = [
   {
     image: "https://t4.ftcdn.net/jpg/05/23/57/17/360_F_523571782_HTB5SQBkfpA5TiKwI0lpHe3sK0VmCaVZ.jpg",
     title: "Cow Protection & Care",
-    description: "Dedicated to protecting cow wealth from sickness, starvation and slaughtering."
+    description: "Protecting cow wealth with shelter, food and medical care."
   },
   {
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReaEYB0tjb8-oTp3lyDPg7ZGYvTzIn5gq8Nw&s",
     title: "Animal Welfare",
-    description: "Rescue, relief and rehabilitation of animals and birds."
-  },
-  {
-    image: "https://images.maher.ac.in/wp-content/uploads/2025/11/Awareness-Session-on-Pediatric-Liver-Health-by-MCOP-2.jpeg",
-    title: "Education & Awareness",
-    description: "Promoting education and awareness on animal welfare and environment."
-  },
-  {
-    image: "https://www.aljazeera.com/wp-content/uploads/2020/01/f7a36fa136804e5a9feb606cdc7e2f9f_18.jpeg",
-    title: "Community Service",
-    description: "Health, education and welfare programmes for women and children."
+    description: "Rescue, relief and rehabilitation for animals."
   }
 ];
 
@@ -30,10 +18,10 @@ const teamData = [
     name: "Manju Goel",
     designation: "Managing Trustee / Founder",
     photo: "https://img.freepik.com/premium-vector/portrait-business-woman_505024-2799.jpg",
-    experience: "15+ years of social work",
+    experience: "15+ years social work",
     education: "Social Worker",
-    message: "Protecting cow wealth with compassion.",
-    bio: "Founder and First Managing Trustee. Holds office for lifetime as per Trust Deed."
+    message: "Serving animals is my life’s mission.",
+    bio: "Founder and First Managing Trustee holding lifetime position."
   },
   {
     id: 2,
@@ -42,207 +30,210 @@ const teamData = [
     photo: "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-174669.jpg",
     experience: "8 years community service",
     education: "Social Worker",
-    message: "Together for animals and humanity.",
-    bio: "Trustee working actively in animal welfare and social initiatives."
+    message: "Compassion creates change.",
+    bio: "Trustee supporting animal welfare initiatives."
   }
 ];
 
-/******************************
- * SPA ROUTER
- ******************************/
-const routes = {
-  "/": homePage,
-  "/about": aboutPage,
-  "/mission": missionPage,
-  "/team": teamPage,
-  "/contact": contactPage,
-  "/donate": donatePage
-};
-
-function navigate(path) {
-  history.pushState({}, "", path);
-  renderRoute();
-}
-
-function renderRoute() {
-  const path = window.location.pathname;
-  const view = routes[path] || homePage;
-  document.getElementById("app").innerHTML = view();
-  setActiveLink(path);
-  initCarousel();
-  initTeamModal();
-}
-
-window.addEventListener("popstate", renderRoute);
-
-document.addEventListener("click", e => {
-  if (e.target.matches("[data-link]")) {
-    e.preventDefault();
-    navigate(e.target.getAttribute("href"));
+// ================= SPA ROUTER =================
+class SPARouter {
+  constructor() {
+    this.routes = {
+      "/": () => this.home(),
+      "/about": () => this.about(),
+      "/mission": () => this.mission(),
+      "/team": () => this.team(),
+      "/contact": () => this.contact(),
+      "/donate": () => this.donate()
+    };
+    this.app = document.getElementById("app");
+    this.init();
   }
-});
 
-/******************************
- * PAGES
- ******************************/
-function homePage() {
-  return `
-  <section class="relative h-[80vh] overflow-hidden">
-    ${carouselData.map((s,i)=>`
-      <div class="slide absolute inset-0 transition-opacity duration-1000 ${i===0?'opacity-100':'opacity-0'}"
-           style="background:url('${s.image}') center/cover fixed">
-        <div class="h-full flex items-center justify-center bg-black/40">
-          <div class="bg-white/20 backdrop-blur p-8 rounded text-center max-w-xl">
-            <h2 class="text-3xl font-bold mb-3 text-white">${s.title}</h2>
-            <p class="text-white">${s.description}</p>
+  init() {
+    this.navigate(location.pathname);
+    window.addEventListener("popstate", () => this.navigate(location.pathname));
+    document.addEventListener("click", e => {
+      const link = e.target.closest(".nav-link");
+      if (link && link.getAttribute("href")) {
+        e.preventDefault();
+        this.navigate(link.getAttribute("href"));
+      }
+    });
+    new ThemeManager();
+    new MobileMenu();
+    if (innerWidth > 768) new CursorTrail();
+  }
+
+  navigate(path) {
+    if (!this.routes[path]) path = "/";
+    history.pushState({}, "", path);
+    this.render(path);
+  }
+
+  render(path) {
+    this.app.innerHTML = "";
+    this.routes[path]();
+    window.scrollTo(0, 0);
+    this.setActive(path);
+    this.afterRender();
+  }
+
+  setActive(path) {
+    document.querySelectorAll(".nav-link").forEach(l =>
+      l.classList.toggle("active-link", l.getAttribute("href") === path)
+    );
+  }
+
+  afterRender() {
+    if (document.querySelector(".hero-slide")) this.initCarousel();
+    if (document.querySelector(".team-card")) this.initTeamModal();
+  }
+
+  // ========== PAGES ==========
+  home() {
+    this.app.innerHTML = `
+    <section class="h-screen relative">
+      ${carouselData.map((s,i)=>`
+        <div class="hero-slide ${i===0?'active':''} absolute inset-0 bg-cover bg-center"
+             style="background-image:url('${s.image}')">
+          <div class="h-full flex items-center bg-black/50">
+            <div class="max-w-xl mx-auto glassmorphism p-8 text-center">
+              <h1 class="text-4xl font-bold text-white mb-4">${s.title}</h1>
+              <p class="text-white mb-6">${s.description}</p>
+              <a href="/donate" class="nav-link bg-green-600 text-white px-6 py-3 rounded">Donate</a>
+            </div>
           </div>
         </div>
-      </div>
-    `).join("")}
-  </section>
-  `;
-}
-
-function aboutPage() {
-  return `<section class="p-10 max-w-4xl mx-auto">
-    <h2 class="text-3xl font-bold mb-4">About Us</h2>
-    <p>Krishna Gopal Gaushala Sewa Trust is a charitable trust working for cow protection, animal welfare and social upliftment.</p>
-  </section>`;
-}
-
-function missionPage() {
-  return `<section class="p-10 max-w-4xl mx-auto">
-    <h2 class="text-3xl font-bold mb-4">Our Mission</h2>
-    <ul class="list-disc pl-6 space-y-2">
-      <li>Protect cow wealth</li>
-      <li>Animal rescue & rehabilitation</li>
-      <li>Education & awareness</li>
-      <li>Community welfare</li>
-    </ul>
-  </section>`;
-}
-
-function teamPage() {
-  return `<section class="p-10 max-w-6xl mx-auto">
-    <h2 class="text-3xl font-bold mb-6">Our Team</h2>
-    <div class="grid md:grid-cols-2 gap-6">
-      ${teamData.map(m=>`
-        <div data-id="${m.id}"
-             class="team-card cursor-pointer bg-white/20 backdrop-blur p-6 rounded shadow hover:scale-105 transition">
-          <img src="${m.photo}" class="w-24 h-24 rounded-full mb-3">
-          <h3 class="font-bold">${m.name}</h3>
-          <p>${m.designation}</p>
-          <p class="italic text-sm mt-2">"${m.message}"</p>
-        </div>
       `).join("")}
-    </div>
-  </section>`;
+    </section>`;
+  }
+
+  about() {
+    this.app.innerHTML = `<section class="p-10 max-w-3xl mx-auto">
+      <h1 class="text-3xl font-bold mb-4">About Us</h1>
+      <p>Registered charitable trust working for cow protection and animal welfare.</p>
+    </section>`;
+  }
+
+  mission() {
+    this.app.innerHTML = `<section class="p-10 max-w-3xl mx-auto">
+      <h1 class="text-3xl font-bold mb-4">Our Mission</h1>
+      <ul class="list-disc pl-6 space-y-2">
+        <li>Cow protection</li>
+        <li>Animal rescue</li>
+        <li>Community welfare</li>
+      </ul>
+    </section>`;
+  }
+
+  team() {
+    this.app.innerHTML = `<section class="p-10 max-w-5xl mx-auto">
+      <h1 class="text-3xl font-bold mb-8">Our Team</h1>
+      <div class="grid md:grid-cols-2 gap-6">
+        ${teamData.map(m=>`
+          <div class="team-card glassmorphism p-6 rounded cursor-pointer" data-id="${m.id}">
+            <img src="${m.photo}" class="w-24 h-24 rounded-full mb-3">
+            <h3 class="font-bold">${m.name}</h3>
+            <p class="text-green-600">${m.designation}</p>
+            <p class="italic mt-2">"${m.message}"</p>
+          </div>
+        `).join("")}
+      </div>
+    </section>`;
+  }
+
+  contact() {
+    this.app.innerHTML = `<section class="p-10 max-w-xl mx-auto">
+      <h1 class="text-3xl font-bold mb-4">Contact</h1>
+      <p>Email: info@krishnagopalgaushala.org</p>
+    </section>`;
+  }
+
+  donate() {
+    this.app.innerHTML = `<section class="p-10 max-w-xl mx-auto text-center">
+      <h1 class="text-3xl font-bold mb-4">Donate</h1>
+      <p class="mb-6">Your support helps us continue our mission.</p>
+      <button class="bg-green-600 text-white px-6 py-3 rounded">Donate Now</button>
+    </section>`;
+  }
+
+  // ===== COMPONENTS =====
+  initCarousel() {
+    let i = 0;
+    const slides = document.querySelectorAll(".hero-slide");
+    setInterval(()=>{
+      slides[i].classList.remove("active");
+      i = (i+1)%slides.length;
+      slides[i].classList.add("active");
+    },5000);
+  }
+
+  initTeamModal() {
+    document.querySelectorAll(".team-card").forEach(card=>{
+      card.onclick=()=>{
+        const m = teamData.find(t=>t.id==card.dataset.id);
+        ["name","designation","experience","education","message","bio"]
+          .forEach(k=>document.getElementById("modal-"+k).textContent=m[k]);
+        document.getElementById("modal-photo").src=m.photo;
+        document.getElementById("team-modal").classList.remove("hidden");
+        document.body.classList.add("modal-open");
+      }
+    });
+    document.getElementById("close-modal").onclick=()=>{
+      document.getElementById("team-modal").classList.add("hidden");
+      document.body.classList.remove("modal-open");
+    }
+  }
 }
 
-function contactPage() {
-  return `<section class="p-10 max-w-xl mx-auto">
-    <h2 class="text-3xl font-bold mb-4">Contact</h2>
-    <p>Email: info@krishnagopaltrust.org</p>
-    <p>Delhi, India</p>
-  </section>`;
+// ================= THEME =================
+class ThemeManager {
+  constructor() {
+    this.toggle=document.getElementById("theme-toggle");
+    this.toggleMobile=document.getElementById("theme-toggle-mobile");
+    this.icon=document.getElementById("theme-icon");
+    this.iconMobile=document.getElementById("theme-icon-mobile");
+    this.init();
+  }
+  init(){
+    if(localStorage.theme==="dark")document.documentElement.classList.add("dark");
+    this.toggle.onclick=this.toggleTheme.bind(this);
+    if(this.toggleMobile)this.toggleMobile.onclick=this.toggleTheme.bind(this);
+  }
+  toggleTheme(){
+    document.documentElement.classList.toggle("dark");
+    localStorage.theme=document.documentElement.classList.contains("dark")?"dark":"light";
+  }
 }
 
-function donatePage() {
-  return `<section class="p-10 max-w-xl mx-auto text-center">
-    <h2 class="text-3xl font-bold mb-4">Support Our Cause</h2>
-    <p class="mb-6">Your donation helps us care for cows, animals and communities.</p>
-    <button class="bg-green-600 text-white px-6 py-3 rounded">Donate Now</button>
-  </section>`;
+// ================= MOBILE MENU =================
+class MobileMenu {
+  constructor(){
+    this.btn=document.getElementById("mobile-menu-button");
+    this.menu=document.getElementById("mobile-menu");
+    if(this.btn)this.btn.onclick=()=>this.menu.classList.toggle("hidden");
+  }
 }
 
-/******************************
- * CAROUSEL
- ******************************/
-let slideIndex = 0;
-function initCarousel() {
-  const slides = document.querySelectorAll(".slide");
-  if (!slides.length) return;
-  setInterval(()=>{
-    slides[slideIndex].classList.remove("opacity-100");
-    slides[slideIndex].classList.add("opacity-0");
-    slideIndex = (slideIndex + 1) % slides.length;
-    slides[slideIndex].classList.remove("opacity-0");
-    slides[slideIndex].classList.add("opacity-100");
-  }, 4000);
+// ================= CURSOR =================
+class CursorTrail {
+  constructor(){
+    this.c=document.getElementById("cursor-trail");
+    this.ctx=this.c.getContext("2d");
+    this.resize();
+    window.onresize=()=>this.resize();
+    document.onmousemove=e=>this.draw(e);
+  }
+  resize(){this.c.width=innerWidth;this.c.height=innerHeight}
+  draw(e){
+    this.ctx.clearRect(0,0,this.c.width,this.c.height);
+    this.ctx.fillStyle="rgba(34,197,94,.5)";
+    this.ctx.beginPath();
+    this.ctx.arc(e.clientX,e.clientY,8,0,Math.PI*2);
+    this.ctx.fill();
+  }
 }
 
-/******************************
- * TEAM MODAL
- ******************************/
-function initTeamModal() {
-  document.querySelectorAll(".team-card").forEach(card=>{
-    card.onclick = ()=>{
-      const m = teamData.find(t=>t.id == card.dataset.id);
-      document.getElementById("modalContent").innerHTML = `
-        <h3 class="text-xl font-bold mb-2">${m.name}</h3>
-        <p><strong>${m.designation}</strong></p>
-        <p class="mt-2">${m.bio}</p>
-        <p class="mt-2"><strong>Experience:</strong> ${m.experience}</p>
-        <p><strong>Education:</strong> ${m.education}</p>
-      `;
-      document.getElementById("modal").classList.remove("hidden");
-    };
-  });
-}
-
-document.getElementById("closeModal").onclick =
-()=> document.getElementById("modal").classList.add("hidden");
-
-/******************************
- * DARK MODE
- ******************************/
-const toggle = document.getElementById("themeToggle");
-const root = document.documentElement;
-
-if (localStorage.theme === "dark") root.classList.add("dark");
-
-toggle.onclick = ()=>{
-  root.classList.toggle("dark");
-  localStorage.theme = root.classList.contains("dark") ? "dark" : "light";
-};
-
-/******************************
- * ACTIVE LINK
- ******************************/
-function setActiveLink(path){
-  document.querySelectorAll(".nav-link").forEach(l=>{
-    l.classList.toggle("text-green-600", l.getAttribute("href")===path);
-  });
-}
-
-/******************************
- * CURSOR CANVAS
- ******************************/
-const canvas = document.getElementById("cursorCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-let dots=[];
-
-window.onmousemove=e=>{
-  dots.push({x:e.clientX,y:e.clientY,life:20});
-};
-
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  dots.forEach((d,i)=>{
-    ctx.fillStyle=`rgba(0,200,100,${d.life/20})`;
-    ctx.beginPath();
-    ctx.arc(d.x,d.y,6,0,Math.PI*2);
-    ctx.fill();
-    d.life--;
-    if(d.life<=0) dots.splice(i,1);
-  });
-  requestAnimationFrame(animate);
-}
-animate();
-
-/******************************
- * INIT
- ******************************/
-renderRoute();
+// ================= INIT =================
+document.addEventListener("DOMContentLoaded",()=>new SPARouter());
